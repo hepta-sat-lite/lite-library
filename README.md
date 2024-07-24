@@ -1,1 +1,1 @@
-# CDH Library for HEPTA-Sat LITE
+# Library for HEPTA-Sat LITE
