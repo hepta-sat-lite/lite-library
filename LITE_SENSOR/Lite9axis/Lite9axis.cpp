@@ -87,11 +87,11 @@ void Lite9axis::gyroCalib(){
 
 }
 
-void Lite9axis::init(char accel_conf, char accel_div, char gyro_conf, char gyro_div)
+void Lite9axis::init()
 {
     reset();
     powerOn();
-    switch((accel_conf >> 1) & 0x03)
+    switch((ACCEL_CONF >> 1) & 0x03)
     {
         case 0:
             aRes = (2.0*9.81)/32768.0;
@@ -106,7 +106,7 @@ void Lite9axis::init(char accel_conf, char accel_div, char gyro_conf, char gyro_
             aRes = (16.0*9.81)/32768.0;
             break;
     }
-    switch((gyro_conf >> 1) & 0x03)
+    switch((GYRO_CONF >> 1) & 0x03)
     {
         case 0:
             gRes = 250.0/32768.0;
@@ -123,10 +123,10 @@ void Lite9axis::init(char accel_conf, char accel_div, char gyro_conf, char gyro_
     }
     // USER_BANK_2 to access data
     ICM_WriteByte(ICM20948_REG_BANK_SEL, USER_BANK_2);
-    ICM_WriteByte(ICM20948_GYRO_CONFIG_1, gyro_conf);
-    ICM_WriteByte(ICM20948_GYRO_SMPLRT_DIV, gyro_div);
-    ICM_WriteByte(ICM20948_ACCEL_CONFIG, accel_conf);
-    ICM_WriteByte(ICM20948_ACCEL_SMPLRT_DIV_2, accel_div);
+    ICM_WriteByte(ICM20948_GYRO_CONFIG_1, GYRO_CONF);
+    ICM_WriteByte(ICM20948_GYRO_SMPLRT_DIV, GYRO_DIV);
+    ICM_WriteByte(ICM20948_ACCEL_CONFIG, ACCEL_CONF);
+    ICM_WriteByte(ICM20948_ACCEL_SMPLRT_DIV_2, ACCEL_DIV);
  
     // USER_BANK_0 to access data
     ICM_WriteByte(ICM20948_REG_BANK_SEL, USER_BANK_0);

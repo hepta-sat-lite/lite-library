@@ -189,7 +189,7 @@
     #define REG_VAL_MAG_MODE_100HZ  0x08
     #define REG_VAL_MAG_MODE_ST     0x10
 /* define ICM-20948 MAG Register  end */
- 
+
 #define MAG_DATA_LEN              6
 #define REG_ADD_MAG_WIA1          0x00
 #define REG_VAL_MAG_WIA1          0x48
@@ -202,8 +202,27 @@
 #else
 #define ICM20948_slave_addr 0x68<<1  // Device address when ADO = 0
 #endif
- 
 #define IMU_ONE_G 9.80665
+
+#define ACCEL_DIV       1
+#define ACCEL_LP        0
+#define ACCEL_LP_EN     1
+#define ACCEL_FS        1
+#define GYRO_DIV        1
+#define GYRO_LP         0
+#define GYRO_LP_EN      1
+#define GYRO_FS         1
+// #define accel_lp        0
+// #define accel_lp_en     1
+// #define accel_fs        1
+// #define gyro_div        1
+// #define gyro_lp         0
+// #define gyro_lp_en      1
+// #define gyro_fs         1
+
+#define ACCEL_CONF  (ACCEL_LP_EN | (ACCEL_FS << 1) | (ACCEL_LP << 3))
+#define GYRO_CONF   (GYRO_LP_EN | (GYRO_FS << 1) | (GYRO_LP << 3))
+
  
 class Lite9axis {
     public:
@@ -215,7 +234,8 @@ class Lite9axis {
         int  whoAmI();
         void reset();
         void powerOn();
-        void init(char accel_conf, char accel_div, char gyro_conf, char gyro_div);
+        // void init(char accel_conf, char accel_div, char gyro_conf, char gyro_div);
+        void init();
         void gyroCalib();
         void getAccGyro();
         void test_getMag();

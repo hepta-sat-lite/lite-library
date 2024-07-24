@@ -7,7 +7,7 @@
 class HeptaXbee
 {
 public:
-    Serial xbee;
+    RawSerial xbee;
     int comrate;
     int rcmd;
     int cmdflag;
