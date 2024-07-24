@@ -1,1 +1,1 @@
-# mbed2_template
+# CDH Library for HEPTA-Sat LITE
