@@ -1,8 +1,8 @@
-#ifndef MBED_LiteAnalogSW_H
-#define MBED_LiteAnalogSW_H
+#ifndef MBED_LITEANALOGSW_H
+#define MBED_LITEANALOGSW_H
 #include "mbed.h"
-//#include "PowerControl/PowerControl.h"
-//#include "PowerControl/EthernetPowerControl.h"
+
+
 
 class LiteAnalogSW{
 public:
