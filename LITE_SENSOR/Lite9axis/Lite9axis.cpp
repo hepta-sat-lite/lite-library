@@ -229,7 +229,10 @@ void Lite9axis::icm20948MagRead()
         s16Buf[0] = ((int16_t)u8Data[1]<<8) | u8Data[0];
         s16Buf[1] = ((int16_t)u8Data[3]<<8) | u8Data[2];
         s16Buf[2] = ((int16_t)u8Data[5]<<8) | u8Data[4];   
-        printf("mx: %f, my: %f, mz: %f \r\n", s16Buf[0]*0.15, s16Buf[1]*0.15, s16Buf[2]*0.15);  
+        mx = s16Buf[0]*0.15;
+        my = s16Buf[1]*0.15;
+        mz = s16Buf[2]*0.15;
+        // printf("mx: %f, my: %f, mz: %f \r\n", s16Buf[0]*0.15, s16Buf[1]*0.15, s16Buf[2]*0.15);  
 
     }
 
@@ -240,6 +243,12 @@ void Lite9axis::icm20948MagRead()
     
     return;
 }
+
+void Lite9axis::getMag(){
+    icm20948MagCheck();
+    icm20948MagRead();
+}
+
 void Lite9axis::test_getMag(){
     char temp;
     printf("test getmag start\r\n");
@@ -413,147 +422,143 @@ void Lite9axis::icm20948WriteSecondary(uint8_t u8I2CAddr, uint8_t u8RegAddr, uin
     return;
 }
 
-void Lite9axis::getMag(){
-    uint8_t counter = 20;
-    uint8_t u8Data[MAG_DATA_LEN];
-    int16_t s16Buf[3] = {0}; 
-    uint8_t i;
-    int32_t s32OutBuf[3] = {0};
-    static ICM20948_ST_AVG_DATA sstAvgBuf[3];
-    while( counter>0 )
-    {
-        wait_ms(10);
-        icm20948ReadSecondary(I2C_ADD_ICM20948_AK09916|I2C_ADD_ICM20948_AK09916_READ, 
-                                    REG_ADD_MAG_ST2, 1, u8Data);
+// void Lite9axis::getMag(){
+//     uint8_t counter = 20;
+//     uint8_t u8Data[MAG_DATA_LEN];
+//     int16_t s16Buf[3] = {0}; 
+//     uint8_t i;
+//     int32_t s32OutBuf[3] = {0};
+//     static ICM20948_ST_AVG_DATA sstAvgBuf[3];
+//     while( counter>0 )
+//     {
+//         wait_ms(10);
+//         icm20948ReadSecondary(I2C_ADD_ICM20948_AK09916|I2C_ADD_ICM20948_AK09916_READ, 
+//                                     REG_ADD_MAG_ST2, 1, u8Data);
         
-        if ((u8Data[0] & 0x01) != 0)
-            break;
+//         if ((u8Data[0] & 0x01) != 0)
+//             break;
         
-        counter--;
-    }
-    printf("counter=%d\r\n", counter);
-    if(counter != 0)
-    {
-        icm20948ReadSecondary( I2C_ADD_ICM20948_AK09916|I2C_ADD_ICM20948_AK09916_READ, 
-                                    REG_ADD_MAG_DATA, 
-                                    MAG_DATA_LEN,
-                                    u8Data);
-        printf("u8Data[0]: %d, u8Data[1]: %d, u8Data[2]: %d\r\n", u8Data[0], u8Data[1], u8Data[2]); 
-        s16Buf[0] = ((int16_t)u8Data[1]<<8) | u8Data[0];
-        s16Buf[1] = ((int16_t)u8Data[3]<<8) | u8Data[2];
-        s16Buf[2] = ((int16_t)u8Data[5]<<8) | u8Data[4];      
-        printf("s16Buf[0]: %f, s16Buf[1]: %f, s16Buf[2]: %f\r\n", s16Buf[0]*0.15, s16Buf[1]*0.15, s16Buf[2]*0.15); 
-    }
+//         counter--;
+//     }
+//     printf("counter=%d\r\n", counter);
+//     if(counter != 0)
+//     {
+//         icm20948ReadSecondary( I2C_ADD_ICM20948_AK09916|I2C_ADD_ICM20948_AK09916_READ, 
+//                                     REG_ADD_MAG_DATA, 
+//                                     MAG_DATA_LEN,
+//                                     u8Data);
+//         printf("u8Data[0]: %d, u8Data[1]: %d, u8Data[2]: %d\r\n", u8Data[0], u8Data[1], u8Data[2]); 
+//         s16Buf[0] = ((int16_t)u8Data[1]<<8) | u8Data[0];
+//         s16Buf[1] = ((int16_t)u8Data[3]<<8) | u8Data[2];
+//         s16Buf[2] = ((int16_t)u8Data[5]<<8) | u8Data[4];      
+//         printf("s16Buf[0]: %f, s16Buf[1]: %f, s16Buf[2]: %f\r\n", s16Buf[0]*0.15, s16Buf[1]*0.15, s16Buf[2]*0.15); 
+//     }
+//     // char val;
+//     // ICM_WriteByte(ICM20948_REG_BANK_SEL, USER_BANK_3);
+//     // I2C_WriteOneByte(REG_ADD_I2C_SLV0_ADDR, u8I2CAddr);
+//     // I2C_WriteOneByte(REG_ADD_I2C_SLV0_REG,  u8RegAddr);
+//     // // ICM_WriteByte(AK09916_CNTL3, 0x01); //reset mag
+//     // // val = ICM_ReadByte(AK09916_CNTL3);
+//     // // printf("CNTL3: 0x%x\r\n", val);
+
+//     // ICM_WriteByte(AK09916_CNTL2, AK09916_MODE_CONTINUOUS_100HZ); //reset mag
+//     // val = ICM_ReadByte(AK09916_CNTL2);
+//     // printf("CNTL2: 0x%x\r\n", val);
+//     // int16_t _mx;
+//     // uint8_t LoByte, HiByte;
+
+//     // LoByte = ICM_ReadByte(ICM20948_GYRO_ZOUT_L);
+//     // HiByte = ICM_ReadByte(ICM20948_GYRO_ZOUT_H);
+
+//     // _mx = (HiByte<<8) | LoByte;
+//     // mx = ((float)(_mx)) * mRes;
 
 
+//     // char cmd[2], data[7],val;
+//     // // Reset magnetometer
+//     // cmd[0] = AK09916_CNTL3;
+//     // cmd[1] = 0x01; // Reset
+//     // _i2c.write(ICM20948_slave_addr, cmd, 2);
+//     // val = _i2c.read(ICM20948_I2C_ADDRESS, data, 2);
+//     // printf("CNTL3: 0x%x\r\n", val);
 
-
-    // char val;
-    // ICM_WriteByte(ICM20948_REG_BANK_SEL, USER_BANK_3);
-    // I2C_WriteOneByte(REG_ADD_I2C_SLV0_ADDR, u8I2CAddr);
-    // I2C_WriteOneByte(REG_ADD_I2C_SLV0_REG,  u8RegAddr);
-    // // ICM_WriteByte(AK09916_CNTL3, 0x01); //reset mag
-    // // val = ICM_ReadByte(AK09916_CNTL3);
-    // // printf("CNTL3: 0x%x\r\n", val);
-
-    // ICM_WriteByte(AK09916_CNTL2, AK09916_MODE_CONTINUOUS_100HZ); //reset mag
-    // val = ICM_ReadByte(AK09916_CNTL2);
-    // printf("CNTL2: 0x%x\r\n", val);
-    // int16_t _mx;
-    // uint8_t LoByte, HiByte;
-
-    // LoByte = ICM_ReadByte(ICM20948_GYRO_ZOUT_L);
-    // HiByte = ICM_ReadByte(ICM20948_GYRO_ZOUT_H);
-
-    // _mx = (HiByte<<8) | LoByte;
-    // mx = ((float)(_mx)) * mRes;
-
-
-    // char cmd[2], data[7],val;
-    // // Reset magnetometer
-    // cmd[0] = AK09916_CNTL3;
-    // cmd[1] = 0x01; // Reset
-    // _i2c.write(ICM20948_slave_addr, cmd, 2);
-    // val = _i2c.read(ICM20948_I2C_ADDRESS, data, 2);
-    // printf("CNTL3: 0x%x\r\n", val);
-
-    // // printf("CNTL2: 0x%x\r\n", cmd[1]);
-    // wait(0.1); // Wait for reset to complete
+//     // // printf("CNTL2: 0x%x\r\n", cmd[1]);
+//     // wait(0.1); // Wait for reset to complete
     
-    // Set to continuous measurement mode at 100Hz
-    // cmd[0] = AK09916_CNTL2;
-    // cmd[1] = AK09916_MODE_CONTINUOUS_100HZ;
-    // _i2c.write(ICM20948_slave_addr, cmd, 2);
-    // val = _i2c.read(ICM20948_slave_addr, data, 2);
-    // printf("CNTL2: 0x%x\r\n", val);
+//     // Set to continuous measurement mode at 100Hz
+//     // cmd[0] = AK09916_CNTL2;
+//     // cmd[1] = AK09916_MODE_CONTINUOUS_100HZ;
+//     // _i2c.write(ICM20948_slave_addr, cmd, 2);
+//     // val = _i2c.read(ICM20948_slave_addr, data, 2);
+//     // printf("CNTL2: 0x%x\r\n", val);
 
-    // char reg = AK09916_HXL;
-    // _i2c.write(ICM20948_slave_addr, &reg, 1, true); // Set the register pointer to HXL
-    // _i2c.read(ICM20948_slave_addr, data, 7); // Read 6 bytes data + 1 status byte
-    // mx = (int16_t)(data[1] << 8 | data[0]);
-    // my = (int16_t)(data[3] << 8 | data[2]);
-    // mz = (int16_t)(data[5] << 8 | data[4]);
-    // printf("mx: %f, my: %f, mz: %f\r\n",mx, my, mz);
+//     // char reg = AK09916_HXL;
+//     // _i2c.write(ICM20948_slave_addr, &reg, 1, true); // Set the register pointer to HXL
+//     // _i2c.read(ICM20948_slave_addr, data, 7); // Read 6 bytes data + 1 status byte
+//     // mx = (int16_t)(data[1] << 8 | data[0]);
+//     // my = (int16_t)(data[3] << 8 | data[2]);
+//     // mz = (int16_t)(data[5] << 8 | data[4]);
+//     // printf("mx: %f, my: %f, mz: %f\r\n",mx, my, mz);
 
 
-    // char data[7]; // 6 bytes data + 1 byte status
-    // char reg = AK09916_HXL;
-    // i2c.write(ICM20948_I2C_ADDRESS, &reg, 1, true); // Set the register pointer to HXL
-    // i2c.read(ICM20948_I2C_ADDRESS, data, 7); // Read 6 bytes data + 1 status byte
+//     // char data[7]; // 6 bytes data + 1 byte status
+//     // char reg = AK09916_HXL;
+//     // i2c.write(ICM20948_I2C_ADDRESS, &reg, 1, true); // Set the register pointer to HXL
+//     // i2c.read(ICM20948_I2C_ADDRESS, data, 7); // Read 6 bytes data + 1 status byte
     
-    // x = (int16_t)(data[1] << 8 | data[0]);
-    // y = (int16_t)(data[3] << 8 | data[2]);
-    // z = (int16_t)(data[5] << 8 | data[4]);
+//     // x = (int16_t)(data[1] << 8 | data[0]);
+//     // y = (int16_t)(data[3] << 8 | data[2]);
+//     // z = (int16_t)(data[5] << 8 | data[4]);
 
-    // int16_t _mx, _my, _mz;
-    // uint8_t LoByte, HiByte, test;
-    // // char cmd[2], data_in[1];
+//     // int16_t _mx, _my, _mz;
+//     // uint8_t LoByte, HiByte, test;
+//     // // char cmd[2], data_in[1];
     
-    // char data_o[1], data_i[1];
-    // data_o[0] = 0x31;
-    // _i2c.write(I2C_ADD_ICM20948_AK09916, data_o, 1, 1);
-    // _i2c.read(I2C_ADD_ICM20948_AK09916, data_i, 1, 0);
-    // printf("CNTL2: 0x%x\r\n", data_i[0]);
+//     // char data_o[1], data_i[1];
+//     // data_o[0] = 0x31;
+//     // _i2c.write(I2C_ADD_ICM20948_AK09916, data_o, 1, 1);
+//     // _i2c.read(I2C_ADD_ICM20948_AK09916, data_i, 1, 0);
+//     // printf("CNTL2: 0x%x\r\n", data_i[0]);
 
-    // cmd[0] = 0x31;
-    // _i2c.write(I2C_ADD_ICM20948_AK09916, cmd, 1);
-    // _i2c.read(I2C_ADD_ICM20948_AK09916, data_in, 1);
-    // printf("CNTL2: %d\r\n", cmd[0]);
-    // cmd[0] = 0x31;
-    // cmd[1] = 0x02;
-    // _i2c.write(I2C_ADD_ICM20948_AK09916, cmd, 2);
-    // _i2c.read(I2C_ADD_ICM20948_AK09916, data_in, 1);
-    // printf("CNTL2: %d\r\n", cmd[0]);
-    // LoByte = ICM_ReadByte_(I2C_ADD_ICM20948_AK09916,ICM20948_MAG_XOUT_L); // read Gyrometer X_Low  value
-    // HiByte = ICM_ReadByte_(I2C_ADD_ICM20948_AK09916,ICM20948_MAG_XOUT_H); // read Gyrometer X_High value
-    // _mx = (HiByte<<8) | LoByte;
-    // mRes = 0.15;
-    // mx = ((float)(_mx)) * mRes;
+//     // cmd[0] = 0x31;
+//     // _i2c.write(I2C_ADD_ICM20948_AK09916, cmd, 1);
+//     // _i2c.read(I2C_ADD_ICM20948_AK09916, data_in, 1);
+//     // printf("CNTL2: %d\r\n", cmd[0]);
+//     // cmd[0] = 0x31;
+//     // cmd[1] = 0x02;
+//     // _i2c.write(I2C_ADD_ICM20948_AK09916, cmd, 2);
+//     // _i2c.read(I2C_ADD_ICM20948_AK09916, data_in, 1);
+//     // printf("CNTL2: %d\r\n", cmd[0]);
+//     // LoByte = ICM_ReadByte_(I2C_ADD_ICM20948_AK09916,ICM20948_MAG_XOUT_L); // read Gyrometer X_Low  value
+//     // HiByte = ICM_ReadByte_(I2C_ADD_ICM20948_AK09916,ICM20948_MAG_XOUT_H); // read Gyrometer X_High value
+//     // _mx = (HiByte<<8) | LoByte;
+//     // mRes = 0.15;
+//     // mx = ((float)(_mx)) * mRes;
 
-    // uint8_t counter = 20;
-    // uint8_t u8Data[6];
-    // int16_t s16Buf[3] = {0}; 
-    // uint8_t i;
-    // int32_t s32OutBuf[3] = {0};
-    // static ICM20948_ST_AVG_DATA sstAvgBuf[3];
-    // while( counter>0 )
-    // {
-    //     wait_ms(10);
-    //     char data_out[1], data_in[1];
-    //     data_out[0] = REG_ADD_MAG_ST2;
-    //     _i2c.write(I2C_ADD_ICM20948_AK09916|I2C_ADD_ICM20948_AK09916_READ, data_out, 1, 1);
-    //     _i2c.read(I2C_ADD_ICM20948_AK09916|I2C_ADD_ICM20948_AK09916_READ, data_in, 1, 0);
-    //     return (data_in[0]);
+//     // uint8_t counter = 20;
+//     // uint8_t u8Data[6];
+//     // int16_t s16Buf[3] = {0}; 
+//     // uint8_t i;
+//     // int32_t s32OutBuf[3] = {0};
+//     // static ICM20948_ST_AVG_DATA sstAvgBuf[3];
+//     // while( counter>0 )
+//     // {
+//     //     wait_ms(10);
+//     //     char data_out[1], data_in[1];
+//     //     data_out[0] = REG_ADD_MAG_ST2;
+//     //     _i2c.write(I2C_ADD_ICM20948_AK09916|I2C_ADD_ICM20948_AK09916_READ, data_out, 1, 1);
+//     //     _i2c.read(I2C_ADD_ICM20948_AK09916|I2C_ADD_ICM20948_AK09916_READ, data_in, 1, 0);
+//     //     return (data_in[0]);
 
-    //     icm20948ReadSecondary( I2C_ADD_ICM20948_AK09916|I2C_ADD_ICM20948_AK09916_READ, 
-    //                                 REG_ADD_MAG_ST2, 1, u8Data);
+//     //     icm20948ReadSecondary( I2C_ADD_ICM20948_AK09916|I2C_ADD_ICM20948_AK09916_READ, 
+//     //                                 REG_ADD_MAG_ST2, 1, u8Data);
         
-    //     if ((u8Data[0] & 0x01) != 0)
-    //         break;
+//     //     if ((u8Data[0] & 0x01) != 0)
+//     //         break;
         
-    //     counter--;
-    // }
-}
+//     //     counter--;
+//     // }
+// }
 
 float Lite9axis::getAX()
 {

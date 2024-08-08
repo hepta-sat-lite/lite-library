@@ -101,11 +101,11 @@ int main() {
                     sensor.getAccGyro();
                     sat.printf(">>>> ax = %f, ay = %f, az = %f\r\n", sensor.getAX(), sensor.getAY(), sensor.getAZ());
                     sat.printf(">>>> gx = %f, gy = %f, gz = %f\r\n", sensor.getGX(), sensor.getGY(), sensor.getGZ());
-                    // sensor.getMag();
-                    sensor.icm20948MagCheck();
-                    sensor.icm20948MagRead();
-                    // sat.printf(">>>> mx = %f, my = %f, mz = %f\r\n", sensor.getMX(), sensor.getMY(), sensor.getMZ());
-                    wait(0.5);
+                    sensor.getMag();
+                    // sensor.icm20948MagCheck();
+                    // sensor.icm20948MagRead();
+                    sat.printf(">>>> mx = %f, my = %f, mz = %f\r\n\r\n", sensor.getMX(), sensor.getMY(), sensor.getMZ());
+                    wait(1);
                 }
             }else if(rcmd == 'd'){
                 // check uplink and downlink
