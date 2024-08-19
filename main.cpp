@@ -1,13 +1,13 @@
 #include "mbed.h"
 #include "LITE_EPS.h"
 #include "LITE_CDH.h"
-#include "LITE_SENSOR.h"
-#include "LITE_COM.h"
+// #include "LITE_SENSOR.h"
+// #include "LITE_COM.h"
 
 LITE_EPS    eps(PA_0,PA_4);
 LITE_CDH    cdh(PB_5, PB_4, PB_3, PA_8, "sd", PA_3);
-LITE_SENSOR sensor(PA_7,PB_7,PB_6);
-LITE_COM    com(PA_9,PA_10,9600);
+// LITE_SENSOR sensor(PA_7,PB_7,PB_6);
+// LITE_COM    com(PA_9,PA_10,9600);
 DigitalOut  condition(PB_1);
 RawSerial   sat(USBTX,USBRX,9600);
 Timer       sattime;
@@ -44,9 +44,9 @@ int main() {
         condition = !condition;
         //senssing HK data
         eps.vol(&batvol);
-        sensor.temp_sense(&temp);
+        // sensor.temp_sense(&temp);
         //Transmitting HK data to Ground Station(sat)
-        sat.printf("HEPTASAT::Condition = %d, Time = %f [s], batvol = %2f [V], temp = %2f [deg C]\r\n",flag,sattime.read(),batvol,temp);
+        // sat.printf("HEPTASAT::Condition = %d, Time = %f [s], batvol = %2f [V], temp = %2f [deg C]\r\n",flag,sattime.read(),batvol,temp);
         wait_ms(1000);
         //Power Saving Mode 
         if(batvol <= 3.5){
@@ -93,35 +93,35 @@ int main() {
                     sat.puts(str);
                 }
                 fclose(fp);
-            }else if(rcmd == 'c'){
-                //check 9axis sensor
-                sat.printf("\r\n9 axis sensor Check Mode\r\n");
-                sensor.init();
-                for(int i = 0; i < 10; i++){
-                    sensor.getAccGyro();
-                    sat.printf(">>>> ax = %f, ay = %f, az = %f\r\n", sensor.getAX(), sensor.getAY(), sensor.getAZ());
-                    sat.printf(">>>> gx = %f, gy = %f, gz = %f\r\n", sensor.getGX(), sensor.getGY(), sensor.getGZ());
-                    sensor.getMag();
-                    // sensor.icm20948MagCheck();
-                    // sensor.icm20948MagRead();
-                    sat.printf(">>>> mx = %f, my = %f, mz = %f\r\n\r\n", sensor.getMX(), sensor.getMY(), sensor.getMZ());
-                    wait(1);
-                }
-            }else if(rcmd == 'd'){
-                // check uplink and downlink
-                sat.printf("\r\nXbee Check Mode\r\n");
-                cdh.turn_on_analogSW();
-                sat.printf("Hit 'a' from sat with Xbee\r\n");
-                com.xbee_receive(&rcmd,&cmdflag);
-                sat.printf("rcmd=%d, cmdflag=%d\r\n",rcmd, cmdflag);
-                if (cmdflag == 1) {
-                    if (rcmd == 'a') {
-                        sat.printf("Command Get %d\r\n",rcmd);
-                        com.printf("HEPTA Uplink OK\r\n");
-                    }
-                    com.initialize();
-                }
-                wait(1.0);
+            // }else if(rcmd == 'c'){
+            //     //check 9axis sensor
+            //     sat.printf("\r\n9 axis sensor Check Mode\r\n");
+            //     sensor.init();
+            //     for(int i = 0; i < 10; i++){
+            //         sensor.getAccGyro();
+            //         sat.printf(">>>> ax = %f, ay = %f, az = %f\r\n", sensor.getAX(), sensor.getAY(), sensor.getAZ());
+            //         sat.printf(">>>> gx = %f, gy = %f, gz = %f\r\n", sensor.getGX(), sensor.getGY(), sensor.getGZ());
+            //         sensor.getMag();
+            //         // sensor.icm20948MagCheck();
+            //         // sensor.icm20948MagRead();
+            //         sat.printf(">>>> mx = %f, my = %f, mz = %f\r\n\r\n", sensor.getMX(), sensor.getMY(), sensor.getMZ());
+            //         wait(1);
+            //     }
+            // }else if(rcmd == 'd'){
+            //     // check uplink and downlink
+            //     sat.printf("\r\nXbee Check Mode\r\n");
+            //     cdh.turn_on_analogSW();
+            //     sat.printf("Hit 'a' from sat with Xbee\r\n");
+            //     com.xbee_receive(&rcmd,&cmdflag);
+            //     sat.printf("rcmd=%d, cmdflag=%d\r\n",rcmd, cmdflag);
+            //     if (cmdflag == 1) {
+            //         if (rcmd == 'a') {
+            //             sat.printf("Command Get %d\r\n",rcmd);
+            //             com.printf("HEPTA Uplink OK\r\n");
+            //         }
+            //         com.initialize();
+            //     }
+            //     wait(1.0);
             }
             initialize(); //initializing
         }

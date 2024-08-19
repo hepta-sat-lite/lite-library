@@ -77,7 +77,6 @@ void Lite9axis::gyroCalib(){
         HiByte = ICM_ReadByte(ICM20948_GYRO_ZOUT_H);
         gztmp = ((HiByte<<8) | LoByte);
         gz += (float)(gztmp) * gRes;
-        //pc.printf("%d %f, %d %f, %d %f\n\r", gxtmp, gx, gytmp, gy, gztmp, gz);
         wait_ms(50);//ThisThread::sleep_for(50ms);
     }
     
@@ -130,8 +129,7 @@ void Lite9axis::init()
  
     // USER_BANK_0 to access data
     ICM_WriteByte(ICM20948_REG_BANK_SEL, USER_BANK_0);
-    wait_ms(10);
-
+    // wait_ms(10);
     gyroCalib();
 }
  
@@ -168,11 +166,6 @@ void Lite9axis::getAccGyro(){
     HiByte = ICM_ReadByte(ICM20948_GYRO_ZOUT_H);
     _gz = (HiByte<<8) | LoByte;
     gz = ((float)(_gz)) * gRes - gyroBias[2];
-
-    // LoByte = ICM_ReadByte(ICM20948_MAG_XOUT_L);
-    // HiByte = ICM_ReadByte(ICM20948_MAG_XOUT_H);
-    // _gz = (HiByte<<8) | LoByte;
-    // gz = ((float)(_gz)) * gRes - gyroBias[2];
     
 }
 
@@ -232,15 +225,7 @@ void Lite9axis::icm20948MagRead()
         mx = s16Buf[0]*0.15;
         my = s16Buf[1]*0.15;
         mz = s16Buf[2]*0.15;
-        // printf("mx: %f, my: %f, mz: %f \r\n", s16Buf[0]*0.15, s16Buf[1]*0.15, s16Buf[2]*0.15);  
-
-    }
-
-    // for(i = 0; i < 3; i ++) 
-    // {
-    //     icm20948CalAvgValue(&sstAvgBuf[i].u8Index, sstAvgBuf[i].s16AvgBuffer, s16Buf[i], s32OutBuf + i);
-    // }
-    
+    }    
     return;
 }
 
