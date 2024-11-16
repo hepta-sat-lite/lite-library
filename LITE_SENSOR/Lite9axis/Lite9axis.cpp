@@ -86,7 +86,7 @@ void Lite9axis::gyroCalib(){
 
 }
 
-void Lite9axis::init()
+void Lite9axis::set_up()
 {
     reset();
     powerOn();
@@ -133,42 +133,82 @@ void Lite9axis::init()
 
     gyroCalib();
 }
- 
-void Lite9axis::getAccGyro(){
-    int16_t _ax, _ay, _az, _gx, _gy, _gz;
+
+void Lite9axis::sen_acc(float *ax,float *ay,float *az){
+    int16_t _ax, _ay, _az;
     uint8_t LoByte, HiByte;
     
     LoByte = ICM_ReadByte(ICM20948_ACCEL_XOUT_L); // read Accelerometer X_Low  value
     HiByte = ICM_ReadByte(ICM20948_ACCEL_XOUT_H); // read Accelerometer X_High value
     _ax = (HiByte<<8) | LoByte;
-    ax = ((float)(_ax)) * aRes;
+    *ax = ((float)(_ax)) * aRes;
     
     LoByte = ICM_ReadByte(ICM20948_ACCEL_YOUT_L);
     HiByte = ICM_ReadByte(ICM20948_ACCEL_YOUT_H);
     _ay = (HiByte<<8) | LoByte;
-    ay = ((float)(_ay)) * aRes;
+    *ay = ((float)(_ay)) * aRes;
     
     LoByte = ICM_ReadByte(ICM20948_ACCEL_ZOUT_L);
     HiByte = ICM_ReadByte(ICM20948_ACCEL_ZOUT_H);
     _az = (HiByte<<8) | LoByte;
-    az = ((float)(_az)) * aRes;
-    
+    *az = ((float)(_az)) * aRes;
+}
+
+void Lite9axis::sen_gyro(float *gx,float *gy,float *gz){
+    int16_t _gx, _gy, _gz;
+    uint8_t LoByte, HiByte;
+
     LoByte = ICM_ReadByte(ICM20948_GYRO_XOUT_L); // read Gyrometer X_Low  value
     HiByte = ICM_ReadByte(ICM20948_GYRO_XOUT_H); // read Gyrometer X_High value
     _gx = (HiByte<<8) | LoByte;
-    gx = ((float)(_gx)) * gRes - gyroBias[0];
+    *gx = ((float)(_gx)) * gRes - gyroBias[0];
     
     LoByte = ICM_ReadByte(ICM20948_GYRO_YOUT_L);
     HiByte = ICM_ReadByte(ICM20948_GYRO_YOUT_H);
     _gy = (HiByte<<8) | LoByte;
-    gy = ((float)(_gy)) * gRes - gyroBias[1];
+    *gy = ((float)(_gy)) * gRes - gyroBias[1];
     
     LoByte = ICM_ReadByte(ICM20948_GYRO_ZOUT_L);
     HiByte = ICM_ReadByte(ICM20948_GYRO_ZOUT_H);
     _gz = (HiByte<<8) | LoByte;
-    gz = ((float)(_gz)) * gRes - gyroBias[2];
-    
+    *gz = ((float)(_gz)) * gRes - gyroBias[2];
 }
+
+// void Lite9axis::getAccGyro(){
+//     int16_t _ax, _ay, _az, _gx, _gy, _gz;
+//     uint8_t LoByte, HiByte;
+    
+//     LoByte = ICM_ReadByte(ICM20948_ACCEL_XOUT_L); // read Accelerometer X_Low  value
+//     HiByte = ICM_ReadByte(ICM20948_ACCEL_XOUT_H); // read Accelerometer X_High value
+//     _ax = (HiByte<<8) | LoByte;
+//     ax = ((float)(_ax)) * aRes;
+    
+//     LoByte = ICM_ReadByte(ICM20948_ACCEL_YOUT_L);
+//     HiByte = ICM_ReadByte(ICM20948_ACCEL_YOUT_H);
+//     _ay = (HiByte<<8) | LoByte;
+//     ay = ((float)(_ay)) * aRes;
+    
+//     LoByte = ICM_ReadByte(ICM20948_ACCEL_ZOUT_L);
+//     HiByte = ICM_ReadByte(ICM20948_ACCEL_ZOUT_H);
+//     _az = (HiByte<<8) | LoByte;
+//     az = ((float)(_az)) * aRes;
+    
+//     LoByte = ICM_ReadByte(ICM20948_GYRO_XOUT_L); // read Gyrometer X_Low  value
+//     HiByte = ICM_ReadByte(ICM20948_GYRO_XOUT_H); // read Gyrometer X_High value
+//     _gx = (HiByte<<8) | LoByte;
+//     gx = ((float)(_gx)) * gRes - gyroBias[0];
+    
+//     LoByte = ICM_ReadByte(ICM20948_GYRO_YOUT_L);
+//     HiByte = ICM_ReadByte(ICM20948_GYRO_YOUT_H);
+//     _gy = (HiByte<<8) | LoByte;
+//     gy = ((float)(_gy)) * gRes - gyroBias[1];
+    
+//     LoByte = ICM_ReadByte(ICM20948_GYRO_ZOUT_L);
+//     HiByte = ICM_ReadByte(ICM20948_GYRO_ZOUT_H);
+//     _gz = (HiByte<<8) | LoByte;
+//     gz = ((float)(_gz)) * gRes - gyroBias[2];
+    
+// }
 
 #define ICM20948_I2C_ADDRESS 0x68 << 1 // <<1 for Mbed OS I2C 7bit addressing
 #define AK09916_CNTL2 0x31
@@ -194,8 +234,9 @@ bool Lite9axis::icm20948MagCheck(){
     return bRet;
 }
 
-void Lite9axis::icm20948MagRead()
+void Lite9axis::sen_mag(float *mx,float *my,float *mz)
 {
+    icm20948MagCheck();
     uint8_t counter = 20;
     uint8_t u8Data[MAG_DATA_LEN];
     int16_t s16Buf[3] = {0}; 
@@ -223,17 +264,17 @@ void Lite9axis::icm20948MagRead()
         s16Buf[0] = ((int16_t)u8Data[1]<<8) | u8Data[0];
         s16Buf[1] = ((int16_t)u8Data[3]<<8) | u8Data[2];
         s16Buf[2] = ((int16_t)u8Data[5]<<8) | u8Data[4];   
-        mx = s16Buf[0]*0.15;
-        my = s16Buf[1]*0.15;
-        mz = s16Buf[2]*0.15;
+        *mx = s16Buf[0]*0.15;
+        *my = s16Buf[1]*0.15;
+        *mz = s16Buf[2]*0.15;
     }    
     return;
 }
 
-void Lite9axis::getMag(){
-    icm20948MagCheck();
-    icm20948MagRead();
-}
+// void Lite9axis::getMag(){
+//     icm20948MagCheck();
+//     icm20948MagRead();
+// }
 
 void Lite9axis::test_getMag(){
     char temp;
@@ -258,10 +299,6 @@ void Lite9axis::test_getMag(){
     ICM_WriteByte(I2C_MST_CTRL, 0x07);
     temp = ICM_ReadByte(I2C_MST_CTRL);
     printf("I2C_MST_CTRL: 0x%x\r\n",temp);
-
-
-
-
 
     // printf("REG_ADD_USER_CTRL: 0x%x\r\n",temp);
     // wait_ms(5);
@@ -408,6 +445,42 @@ void Lite9axis::icm20948WriteSecondary(uint8_t u8I2CAddr, uint8_t u8RegAddr, uin
     return;
 }
 
+// void Lite9axis::icm20948MagRead()
+// {
+//     uint8_t counter = 20;
+//     uint8_t u8Data[MAG_DATA_LEN];
+//     int16_t s16Buf[3] = {0}; 
+//     uint8_t i;
+//     int32_t s32OutBuf[3] = {0};
+//     static ICM20948_ST_AVG_DATA sstAvgBuf[3];
+//     while( counter>0 )
+//     {
+//         HAL_Delay(10);
+//         icm20948ReadSecondary( I2C_ADD_ICM20948_AK09916|I2C_ADD_ICM20948_AK09916_READ, 
+//                                     REG_ADD_MAG_ST2, 1, u8Data);
+        
+//         if ((u8Data[0] & 0x01) != 0)
+//             break;
+        
+//         counter--;
+//     }
+    
+//     if(counter != 0)
+//     {
+//         icm20948ReadSecondary( I2C_ADD_ICM20948_AK09916|I2C_ADD_ICM20948_AK09916_READ, 
+//                                     REG_ADD_MAG_DATA, 
+//                                     MAG_DATA_LEN,
+//                                     u8Data);
+//         s16Buf[0] = ((int16_t)u8Data[1]<<8) | u8Data[0];
+//         s16Buf[1] = ((int16_t)u8Data[3]<<8) | u8Data[2];
+//         s16Buf[2] = ((int16_t)u8Data[5]<<8) | u8Data[4];   
+//         mx = s16Buf[0]*0.15;
+//         my = s16Buf[1]*0.15;
+//         mz = s16Buf[2]*0.15;
+//     }    
+//     return;
+// }
+
 // void Lite9axis::getMag(){
 //     uint8_t counter = 20;
 //     uint8_t u8Data[MAG_DATA_LEN];
@@ -546,50 +619,50 @@ void Lite9axis::icm20948WriteSecondary(uint8_t u8I2CAddr, uint8_t u8RegAddr, uin
 //     // }
 // }
 
-float Lite9axis::getAX()
-{
-    return ax;
-}
+// float Lite9axis::getAX()
+// {
+//     return ax;
+// }
 
-float Lite9axis::getAY()
-{
-    return ay;
-}
+// float Lite9axis::getAY()
+// {
+//     return ay;
+// }
 
-float Lite9axis::getAZ()
-{
-    return az;
-}
+// float Lite9axis::getAZ()
+// {
+//     return az;
+// }
 
-float Lite9axis::getGX()
-{
-    return gx;
-}
+// float Lite9axis::getGX()
+// {
+//     return gx;
+// }
 
-float Lite9axis::getGY()
-{
-    return gy;
-}
+// float Lite9axis::getGY()
+// {
+//     return gy;
+// }
 
-float Lite9axis::getGZ()
-{
-    return gz;
-}
+// float Lite9axis::getGZ()
+// {
+//     return gz;
+// }
 
-float Lite9axis::getMX()
-{
-    return mx;
-}
+// float Lite9axis::getMX()
+// {
+//     return mx;
+// }
 
-float Lite9axis::getMY()
-{
-    return my;
-}
+// float Lite9axis::getMY()
+// {
+//     return my;
+// }
 
-float Lite9axis::getMZ()
-{
-    return mz;
-}
+// float Lite9axis::getMZ()
+// {
+//     return mz;
+// }
 // int ICM20948::getIMUTemp()
 // {
 //     uint8_t LoByte, HiByte;

@@ -97,15 +97,20 @@ int main() {
             }else if(rcmd == 'c'){
                 //check 9axis sensor
                 sat.printf("\r\n9 axis sensor Check Mode\r\n");
-                sensor.init();
+                float ax,ay,az,gx,gy,gz,mx,my,mz;
+                sensor.set_up();
                 for(int i = 0; i < 10; i++){
-                    sensor.getAccGyro();
-                    sat.printf(">>>> ax = %f, ay = %f, az = %f\r\n", sensor.getAX(), sensor.getAY(), sensor.getAZ());
-                    sat.printf(">>>> gx = %f, gy = %f, gz = %f\r\n", sensor.getGX(), sensor.getGY(), sensor.getGZ());
-                    sensor.getMag();
+                    sensor.sen_acc(&ax,&ay,&az);
+                    sat.printf("acc : %f,%f,%f\r\n",ax,ay,az);
+                    sensor.sen_gyro(&gx,&gy,&gz);
+                    sat.printf("gyro : %f,%f,%f\r\n",gx,gy,gz);
+                    sensor.sen_mag(&mx,&my,&mz);
+                    sat.printf("mag : %f,%f,%f\r\n\r\n",mx,my,mz);
+                    // sat.printf(">>>> gx = %f, gy = %f, gz = %f\r\n", sensor.getGX(), sensor.getGY(), sensor.getGZ());
+                    // sensor.getMag();
                     // sensor.icm20948MagCheck();
                     // sensor.icm20948MagRead();
-                    sat.printf(">>>> mx = %f, my = %f, mz = %f\r\n\r\n", sensor.getMX(), sensor.getMY(), sensor.getMZ());
+                    // sat.printf(">>>> mx = %f, my = %f, mz = %f\r\n\r\n", sensor.getMX(), sensor.getMY(), sensor.getMZ());
                     wait(1);
                 }
             }else if(rcmd == 'd'){

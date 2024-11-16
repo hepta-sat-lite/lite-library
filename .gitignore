@@ -4,3 +4,5 @@ compile_commands.json
 .clangd
 .cache
 mbed
+LITE_CDH/SDFileSystem/FATFileSystem
+LITE_CDH/SDFileSystem
