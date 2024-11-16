@@ -62,7 +62,7 @@ void Lite9axis::gyroCalib(){
     float gx, gy, gz;
     gx = 0.0; gy = 0.0; gz = 0.0;
     uint8_t LoByte, HiByte;
-    for(int i = 0; i < 100; i++){
+    for(int i = 0; i < 10; i++){
         LoByte = ICM_ReadByte(ICM20948_GYRO_XOUT_L); // read Gyrometer X_Low  value
         HiByte = ICM_ReadByte(ICM20948_GYRO_XOUT_H); // read Gyrometer X_High value
         gxtmp = ((HiByte<<8) | LoByte);
@@ -129,7 +129,8 @@ void Lite9axis::init()
  
     // USER_BANK_0 to access data
     ICM_WriteByte(ICM20948_REG_BANK_SEL, USER_BANK_0);
-    // wait_ms(10);
+    wait_ms(20);
+
     gyroCalib();
 }
  

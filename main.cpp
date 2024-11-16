@@ -111,17 +111,19 @@ int main() {
             }else if(rcmd == 'd'){
                 // check uplink and downlink
                 sat.printf("\r\nXbee Check Mode\r\n");
+                rcmd = 0;
                 cdh.turn_on_analogSW();
-                sat.printf("Hit 'a' from sat with Xbee\r\n");
-                com.xbee_receive(&rcmd,&cmdflag);
-                sat.printf("rcmd=%d, cmdflag=%d\r\n",rcmd, cmdflag);
-                if (cmdflag == 1) {
-                    if (rcmd == 'a') {
-                        sat.printf("Command Get %d\r\n",rcmd);
-                        com.printf("HEPTA Uplink OK\r\n");
-                    }
-                    com.initialize();
-                }
+                // sat.printf("Hit 'a' from sat with Xbee\r\n");
+                com.printf("Hi there\r\n");
+                // com.xbee_receive(&rcmd,&cmdflag);
+                // sat.printf("rcmd=%d, cmdflag=%d\r\n",rcmd, cmdflag);
+                // if (cmdflag == 1) {
+                //     if (rcmd == 'a') {
+                //         sat.printf("Command Get %d\r\n",rcmd);
+                //         com.printf("HEPTA Uplink OK\r\n");
+                //     }
+                //     com.initialize();
+                // }
                 wait(1.0);
             }
             initialize(); //initializing
