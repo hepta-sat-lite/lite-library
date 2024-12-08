@@ -44,9 +44,10 @@ int main() {
         condition = !condition;
         //senssing HK data
         eps.vol(&batvol);
-        // sensor.temp_sense(&temp);
+        sensor.temp_sense(&temp);
         //Transmitting HK data to Ground Station(sat)
-        // sat.printf("HEPTASAT::Condition = %d, Time = %f [s], batvol = %2f [V], temp = %2f [deg C]\r\n",flag,sattime.read(),batvol,temp);
+        sat.printf("HEPTASAT::Condition = %d, Time = %f [s], batvol = %2f [V], temp = %2f [deg C]\r\n",flag,sattime.read(),batvol,temp);
+
         wait_ms(1000);
         //Power Saving Mode 
         if(batvol <= 3.5){
