@@ -88,6 +88,7 @@ void Lite9axis::gyroCalib(){
 
 void Lite9axis::set_up()
 {
+    wait_ms(10);
     reset();
     powerOn();
     switch((ACCEL_CONF >> 1) & 0x03)
